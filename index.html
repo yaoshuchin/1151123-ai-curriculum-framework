@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI導入課程與評量——AI素養融入教學與學生學習的實務架構 | 施君潔主任</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#0c4a6e',
+                            900: '#082f49',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap');
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.85);
+        }
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        /* Hide scrollbar for category tabs */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+    <!-- ==================== 密碼鎖定畫面 (Password Gate: 049) ==================== -->
+    <div id="auth-gate" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 transition-opacity duration-300">
+        <div class="max-w-md w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 border border-slate-200/60 dark:border-slate-700 text-center relative overflow-hidden">
+            <!-- Background Glow -->
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-sky-500/20 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl"></div>
+
+            <div class="w-16 h-16 bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                <i data-lucide="shield-check" class="w-8 h-8"></i>
+            </div>
+
+            <h2 class="text-2xl font-bold tracking-tight mb-2 text-slate-900 dark:text-white">AI 導入課程與評量</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">實務架構知識庫 · 請輸入訪問密碼進入</p>
+
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div class="relative">
+                    <input 
+                        type="password" 
+                        id="pwd-input" 
+                        placeholder="請輸入密碼 (例如：049)" 
+                        autofocus
+                        class="w-full px-5 py-3.5 text-center tracking-widest text-lg font-mono rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                    />
+                </div>
+                <div id="auth-err" class="text-xs text-rose-500 font-medium h-5 flex items-center justify-center gap-1 opacity-0 transition-opacity">
+                    <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+                    <span>密碼錯誤，請重新輸入！</span>
+                </div>
+                <button 
+                    type="submit" 
+                    class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-semibold shadow-lg shadow-sky-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    <span>解鎖進入知識庫</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </form>
+            <p class="text-xs text-slate-400 mt-6 flex items-center justify-center gap-1">
+                <i data-lucide="info" class="w-3 h-3"></i> 提示：通關密碼為南投區碼 <span class="font-mono font-semibold text-sky-600 dark:text-sky-400">049</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- ==================== 主應用程式內容 ==================== -->
+    <div id="app-container" class="hidden min-h-screen flex flex-col">
+        
+        <!-- 頂部導航列 -->
+        <header class="sticky top-0 z-40 glass border-b border-slate-200/80 dark:border-slate-800 transition-colors">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white flex items-center justify-center shadow-md">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-base sm:text-lg font-bold leading-tight flex items-center gap-2">
+                            <span>AI 導入課程與評量</span>
+                            <span class="text-xs font-normal px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300 hidden sm:inline-block">實務架構</span>
+                        </h1>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 hidden md:block">講師：施君潔主任（南投縣史港國小 / 教育部數位學習輔導專家）</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- Word 檔案下載按鈕 -->
+                    <a 
+                        href="AI導入課程與評量_實務架構手冊_施君潔.docx" 
+                        download
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800 text-xs font-medium transition-all shadow-sm"
+                        title="下載完整 Word 講義 (.docx)">
+                        <i data-lucide="file-down" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">下載 Word 手冊</span>
+                    </a>
+
+                    <!-- 列印 / 匯出 PDF -->
+                    <button 
+                        onclick="window.print()" 
+                        class="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium transition-all"
+                        title="友善列印">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                    </button>
+
+                    <!-- 深色模式切換 -->
+                    <button 
+                        id="theme-toggle" 
+                        onclick="toggleDarkMode()" 
+                        class="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        title="切換色彩模式">
+                        <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
+                    </button>
+
+                    <!-- 重新鎖定 -->
+                    <button 
+                        onclick="lockApp()" 
+                        class="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-rose-50 dark:hover:bg-rose-950/60 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                        title="鎖定離開">
+                        <i data-lucide="lock" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Banner 英雄區 -->
+        <section class="bg-gradient-to-b from-sky-50/70 via-indigo-50/30 to-transparent dark:from-slate-800/50 dark:via-slate-800/20 dark:to-transparent border-b border-slate-200/60 dark:border-slate-800 py-10 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-5xl mx-auto text-center">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100/80 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 text-xs font-semibold mb-4 border border-sky-200/50 dark:border-sky-800/50">
+                    <i data-lucide="anchor" class="w-3.5 h-3.5"></i>
+                    <span>AI 是鷹架（Scaffold），不是拐杖（Crutch）</span>
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-3">
+                    AI 素養融入教學與學生學習的實務架構
+                </h2>
+                <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-3xl mx-auto mb-6 leading-relaxed">
+                    先有「主動、積極的態度」，再有「思考的方法」，最後強化「使用工具的技巧」。關注抽離 AI 支援後的學習留存、遷移能力與深度思考力。
+                </p>
+
+                <!-- 快速指標統計卡 -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto text-left">
+                    <div class="bg-white/80 dark:bg-slate-800/80 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <span class="text-xs text-slate-500 dark:text-slate-400">課堂決策審查</span>
+                        <div class="text-xl font-bold text-sky-600 dark:text-sky-400 flex items-center justify-between">
+                            <span>6 大提問</span>
+                            <i data-lucide="help-circle" class="w-4 h-4 opacity-70"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white/80 dark:bg-slate-800/80 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <span class="text-xs text-slate-500 dark:text-slate-400">學生課堂實踐</span>
+                        <div class="text-xl font-bold text-indigo-600 dark:text-indigo-400 flex items-center justify-between">
+                            <span>6 步流程</span>
+                            <i data-lucide="footprints" class="w-4 h-4 opacity-70"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white/80 dark:bg-slate-800/80 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <span class="text-xs text-slate-500 dark:text-slate-400">教案設計檢核</span>
+                        <div class="text-xl font-bold text-emerald-600 dark:text-emerald-400 flex items-center justify-between">
+                            <span>7 項指標</span>
+                            <i data-lucide="check-square" class="w-4 h-4 opacity-70"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white/80 dark:bg-slate-800/80 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <span class="text-xs text-slate-500 dark:text-slate-400">認知防外包</span>
+                        <div class="text-xl font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between">
+                            <span>Bloom 6層</span>
+                            <i data-lucide="layers" class="w-4 h-4 opacity-70"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 核心操作工具列：搜尋 + 分類 + 視圖切換 -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+            
+            <!-- 搜尋與篩選操控面板 -->
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+                <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+                    <!-- 即時關鍵字搜尋框 -->
+                    <div class="relative flex-1">
+                        <i data-lucide="search" class="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            oninput="handleSearch(this.value)" 
+                            placeholder="搜尋核心理念、提問、流程、檢核指標、國語文策略、學者研究 (例: 鷹架, 查證, 049, 換句話說)..."
+                            class="w-full pl-11 pr-10 py-3 rounded-2xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
+                        />
+                        <button 
+                            id="clear-search" 
+                            onclick="clearSearch()" 
+                            class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- 視圖切換標籤 (卡片 / 課堂六步模擬 / 指標檢核表 / Bloom階梯 / 能力圖像對比) -->
+                    <div class="inline-flex p-1 bg-slate-100 dark:bg-slate-700/60 rounded-2xl self-start md:self-auto overflow-x-auto max-w-full text-xs font-medium">
+                        <button onclick="switchView('cards')" id="view-btn-cards" class="px-3.5 py-2 rounded-xl transition-all shadow-sm bg-white dark:bg-slate-800 text-sky-600 dark:text-sky-400 font-semibold flex items-center gap-1.5">
+                            <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                            <span>全覽卡片</span>
+                        </button>
+                        <button onclick="switchView('stepper')" id="view-btn-stepper" class="px-3.5 py-2 rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 flex items-center gap-1.5">
+                            <i data-lucide="play-circle" class="w-3.5 h-3.5"></i>
+                            <span>課堂六部曲</span>
+                        </button>
+                        <button onclick="switchView('checklist')" id="view-btn-checklist" class="px-3.5 py-2 rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 flex items-center gap-1.5">
+                            <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+                            <span>7項檢核工具</span>
+                        </button>
+                        <button onclick="switchView('bloom')" id="view-btn-bloom" class="px-3.5 py-2 rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 flex items-center gap-1.5">
+                            <i data-lucide="triangle" class="w-3.5 h-3.5"></i>
+                            <span>Bloom金字塔</span>
+                        </button>
+                        <button onclick="switchView('matrix')" id="view-btn-matrix" class="px-3.5 py-2 rounded-xl transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 flex items-center gap-1.5">
+                            <i data-lucide="table-2" class="w-3.5 h-3.5"></i>
+                            <span>素養總表</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 分類標籤滑動條 (Category Filter Pills) -->
+                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-2 text-xs">
+                    <button onclick="filterCategory('all')" class="cat-pill active px-3.5 py-1.5 rounded-full bg-slate-900 dark:bg-sky-600 text-white font-medium whitespace-nowrap transition-all shadow-sm" data-category="all">
+                        全部主題 (<span id="count-all">0</span>)
+                    </button>
+                    <button onclick="filterCategory('theory')" class="cat-pill px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 whitespace-nowrap transition-all" data-category="theory">
+                        💡 核心理念與實證研究
+                    </button>
+                    <button onclick="filterCategory('questions')" class="cat-pill px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 whitespace-nowrap transition-all" data-category="questions">
+                        🧭 六大課堂提問
+                    </button>
+                    <button onclick="filterCategory('workflow')" class="cat-pill px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 whitespace-nowrap transition-all" data-category="workflow">
+                        🚀 學生課堂六部曲
+                    </button>
+                    <button onclick="filterCategory('indicators')" class="cat-pill px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 whitespace-nowrap transition-all" data-category="indicators">
+                        📋 七項學習設計指標
+                    </button>
+                    <button onclick="filterCategory('bloom')" class="cat-pill px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 whitespace-nowrap transition-all" data-category="bloom">
+                        🔺 Bloom 不能外包能力
+                    </button>
+                    <button onclick="filterCategory('chinese')" class="cat-pill px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 whitespace-nowrap transition-all" data-category="chinese">
+                        📖 國語文閱讀理解策略
+                    </button>
+                    <button onclick="filterCategory('framework')" class="cat-pill px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 whitespace-nowrap transition-all" data-category="framework">
+                        🏛️ 教育部 AI 能力圖像
+                    </button>
+                    <button onclick="filterCategory('author')" class="cat-pill px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 whitespace-nowrap transition-all" data-category="author">
+                        👤 講師簡介與資歷
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 1: 卡片網格 (Cards Grid) ==================== -->
+            <div id="view-cards" class="space-y-4">
+                <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
+                    <span>顯示筆數：<strong id="results-count" class="text-slate-900 dark:text-white">0</strong> 筆內容項目</span>
+                    <span id="active-filter-label" class="text-sky-600 dark:text-sky-400 font-medium">全部主題</span>
+                </div>
+
+                <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Cards injected via JS -->
+                </div>
+
+                <!-- 無搜尋結果提示 -->
+                <div id="no-results" class="hidden text-center py-16 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 p-8">
+                    <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="search-x" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-base font-semibold text-slate-800 dark:text-slate-200 mb-1">找不到相符的內容</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-4">請嘗試更換關鍵字（如：鷹架、Bastani、提問、查證、國語文、049），或清除搜尋。</p>
+                    <button onclick="clearSearch()" class="px-4 py-2 rounded-xl bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400 text-xs font-semibold hover:bg-sky-100">清除搜尋條件</button>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 2: 課堂六步實踐互動模擬器 ==================== -->
+            <div id="view-stepper" class="hidden space-y-6">
+                <div class="bg-gradient-to-r from-sky-600 to-indigo-700 text-white rounded-3xl p-6 sm:p-8 shadow-xl">
+                    <div class="max-w-3xl">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium mb-3 backdrop-blur-sm">
+                            <i data-lucide="sparkle" class="w-3.5 h-3.5"></i>
+                            <span>課堂實踐指引 · UNESCO 學生 AI 能力框架</span>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">學生課堂六部曲流程：先保留思考，再讓 AI 成為可被質疑的夥伴</h3>
+                        <p class="text-sky-100 text-xs sm:text-sm leading-relaxed mb-4">
+                            避免學生直接索取 AI 產出而產生「後設認知怠惰」。點擊下方各步驟檢視具體任務與教師關鍵引導語，並可一鍵複製提示語模組。
+                        </p>
+                        <!-- 核心口訣一覽 -->
+                        <div class="p-3 bg-white/10 rounded-2xl border border-white/20 text-xs sm:text-sm font-medium flex flex-wrap items-center gap-2">
+                            <span class="text-amber-300 font-bold">教師提示口訣：</span>
+                            <span class="underline decoration-amber-300 underline-offset-4">「你原本怎麼想？」</span> ➔
+                            <span class="underline decoration-amber-300 underline-offset-4">「AI 的哪句話有證據？」</span> ➔
+                            <span class="underline decoration-amber-300 underline-offset-4">「你改了什麼？」</span> ➔
+                            <span class="underline decoration-amber-300 underline-offset-4">「現在不看 AI 再說一次。」</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 流程步進指示器 -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <button onclick="setStep(0)" id="step-tab-0" class="step-tab p-4 rounded-2xl bg-white dark:bg-slate-800 border-2 border-sky-500 text-left transition-all shadow-sm">
+                        <span class="text-xs font-mono font-bold text-sky-600 dark:text-sky-400 block mb-1">STEP 01</span>
+                        <div class="text-base font-bold">1. 先想</div>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 mt-1 block">保留自主認知</span>
+                    </button>
+                    <button onclick="setStep(1)" id="step-tab-1" class="step-tab p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left transition-all hover:border-slate-300">
+                        <span class="text-xs font-mono font-bold text-slate-400 block mb-1">STEP 02</span>
+                        <div class="text-base font-bold">2. 再問</div>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 mt-1 block">目的導向提問</span>
+                    </button>
+                    <button onclick="setStep(2)" id="step-tab-2" class="step-tab p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left transition-all hover:border-slate-300">
+                        <span class="text-xs font-mono font-bold text-slate-400 block mb-1">STEP 03</span>
+                        <div class="text-base font-bold">3. 查證</div>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 mt-1 block">交叉比對證據</span>
+                    </button>
+                    <button onclick="setStep(3)" id="step-tab-3" class="step-tab p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left transition-all hover:border-slate-300">
+                        <span class="text-xs font-mono font-bold text-slate-400 block mb-1">STEP 04</span>
+                        <div class="text-base font-bold">4. 取捨</div>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 mt-1 block">說出修正理由</span>
+                    </button>
+                    <button onclick="setStep(4)" id="step-tab-4" class="step-tab p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left transition-all hover:border-slate-300">
+                        <span class="text-xs font-mono font-bold text-slate-400 block mb-1">STEP 05</span>
+                        <div class="text-base font-bold">5. 揭露</div>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 mt-1 block">標註協作歷程</span>
+                    </button>
+                    <button onclick="setStep(5)" id="step-tab-5" class="step-tab p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-left transition-all hover:border-slate-300">
+                        <span class="text-xs font-mono font-bold text-slate-400 block mb-1">STEP 06</span>
+                        <div class="text-base font-bold">6. 脫離</div>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 mt-1 block">無AI獨立遷移</span>
+                    </button>
+                </div>
+
+                <!-- 步進詳情面板 -->
+                <div id="step-detail-card" class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 3: 7項學習設計指標檢核工具 ==================== -->
+            <div id="view-checklist" class="hidden space-y-6">
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <i data-lucide="clipboard-check" class="w-6 h-6 text-emerald-500"></i>
+                                <span>七項學習設計指標 備課檢核工具</span>
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                                逐項檢核備課活動是否落實人本主體與有效鷹架。完成勾選後可自動生成教師教學省思句型！
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-medium text-slate-500">檢核進度：</span>
+                            <span id="checklist-progress" class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold text-xs">0 / 7 項通過</span>
+                        </div>
+                    </div>
+
+                    <!-- 7 Indicators Interactive Table -->
+                    <div class="space-y-3 pt-2" id="checklist-items">
+                        <!-- Injected via JS -->
+                    </div>
+
+                    <!-- 教師教學省思句型產生器 -->
+                    <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700 space-y-3">
+                        <div class="flex items-center gap-2 text-sm font-bold text-sky-700 dark:text-sky-300">
+                            <i data-lucide="message-square" class="w-4 h-4"></i>
+                            <span>教師教學觀察與反思句型公式產生器</span>
+                        </div>
+                        <p class="text-xs text-slate-500">根據課堂觀察到的學生行為與檢核結果，填寫關鍵字產生專業教學省思紀錄：</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <label class="block font-medium mb-1 text-slate-600 dark:text-slate-300">我看到學生（行為表現）：</label>
+                                <input type="text" id="ref-1" placeholder="例：過度複製 AI 的段落大意，未轉換為自己的語彙" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-xs" oninput="updateReflection()" />
+                            </div>
+                            <div>
+                                <label class="block font-medium mb-1 text-slate-600 dark:text-slate-300">這可能（支持 / 阻礙）：</label>
+                                <input type="text" id="ref-2" placeholder="例：阻礙學生對文章深層文義的自主推論內化" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-xs" oninput="updateReflection()" />
+                            </div>
+                            <div>
+                                <label class="block font-medium mb-1 text-slate-600 dark:text-slate-300">下一輪可嘗試（調整策略）：</label>
+                                <input type="text" id="ref-3" placeholder="例：在提問前先要求學生口述三個關鍵字並用手寫記錄" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-xs" oninput="updateReflection()" />
+                            </div>
+                            <div>
+                                <label class="block font-medium mb-1 text-slate-600 dark:text-slate-300">再用（證據確認）：</label>
+                                <input type="text" id="ref-4" placeholder="例：脫離 AI 後的紙筆手寫白話詮釋測驗" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-xs" oninput="updateReflection()" />
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-xs sm:text-sm">
+                            <span class="font-bold text-sky-800 dark:text-sky-200 block mb-1">【生成的專業反思語】：</span>
+                            <p id="reflection-output" class="text-slate-700 dark:text-slate-200 font-serif italic">
+                                『我看到學生……，這可能支持/阻礙……；下一輪可嘗試……，再用……證據確認。』
+                            </p>
+                            <button onclick="copyReflection()" class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-600 text-white font-medium text-xs hover:bg-sky-500 transition-all">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                                <span>複製反思句</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 4: Bloom-AI 不能外包金字塔 ==================== -->
+            <div id="view-bloom" class="hidden space-y-6">
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                    <div class="max-w-3xl">
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-xs font-semibold mb-2">
+                            <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+                            <span>Schober, R. (2025) BLOOM-AI Framework</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">不能讓 AI 外包的學習能力 × 國語文實作</h3>
+                        <p class="text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed">
+                            AI 擅長處理「基礎知識支持」（Foundational Knowledge），而教師必須引領「高階認知發展」（Higher-Order Thinking）。點擊各階層查看核心能力、防外包準則及國語文領域對應教學內容。
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                        <!-- 金字塔視覺選單 (5 cols) -->
+                        <div class="lg:col-span-5 space-y-2">
+                            <button onclick="selectBloom(5)" id="bloom-btn-5" class="bloom-lvl w-full p-3 rounded-2xl bg-rose-500 text-white font-bold text-sm text-center shadow-sm hover:scale-[1.02] transition-all">
+                                🔺 創造 Create (最高層次)
+                            </button>
+                            <button onclick="selectBloom(4)" id="bloom-btn-4" class="bloom-lvl w-full p-3 rounded-2xl bg-orange-500 text-white font-bold text-sm text-center shadow-sm hover:scale-[1.02] transition-all">
+                                ⚖️ 評估 Evaluate
+                            </button>
+                            <button onclick="selectBloom(3)" id="bloom-btn-3" class="bloom-lvl w-full p-3 rounded-2xl bg-amber-500 text-white font-bold text-sm text-center shadow-sm hover:scale-[1.02] transition-all">
+                                🔍 分析 Analyze
+                            </button>
+                            <button onclick="selectBloom(2)" id="bloom-btn-2" class="bloom-lvl w-full p-3 rounded-2xl bg-emerald-500 text-white font-bold text-sm text-center shadow-sm hover:scale-[1.02] transition-all">
+                                ⚙️ 應用 Apply
+                            </button>
+                            <button onclick="selectBloom(1)" id="bloom-btn-1" class="bloom-lvl w-full p-3 rounded-2xl bg-sky-500 text-white font-bold text-sm text-center shadow-sm hover:scale-[1.02] transition-all">
+                                💡 理解 Understand
+                            </button>
+                            <button onclick="selectBloom(0)" id="bloom-btn-0" class="bloom-lvl w-full p-3 rounded-2xl bg-indigo-500 text-white font-bold text-sm text-center shadow-sm hover:scale-[1.02] transition-all">
+                                🧠 記憶 Remember
+                            </button>
+                        </div>
+
+                        <!-- 階層詳情卡片 (7 cols) -->
+                        <div id="bloom-detail-card" class="lg:col-span-7 bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-600 space-y-4">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 5: 素養總表與能力圖像 ==================== -->
+            <div id="view-matrix" class="hidden space-y-6">
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1">教育部未來人才 AI 能力圖像（三階段比對）</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                            教育部 115.05.22 發布：從國小起步（使用到思考）、國中深化（使用到認識），到高中精進（使用到協作）。
+                        </p>
+                    </div>
+
+                    <!-- 階段切換 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-5 rounded-2xl bg-sky-50/70 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 rounded-full bg-sky-200 text-sky-800 dark:bg-sky-900 dark:text-sky-200 text-xs font-bold">國小階段</span>
+                                <span class="text-xs text-sky-600 dark:text-sky-400 font-medium">從使用到思考</span>
+                            </div>
+                            <ul class="text-xs space-y-2 text-slate-700 dark:text-slate-300">
+                                <li><strong>運用AI學習：</strong>認識及使用教育用AI，會提問及多輪對話</li>
+                                <li><strong>負責任使用AI：</strong>知道AI不一定正確，會基本查證、不亂用</li>
+                                <li><strong>運用AI解決問題：</strong>透過與AI互動，輔助完成學習任務</li>
+                                <li><strong>AI無法取代能力：</strong>發現問題、能表達創意想法、與人合作</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 rounded-full bg-indigo-200 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 text-xs font-bold">國中階段</span>
+                                <span class="text-xs text-indigo-600 dark:text-indigo-400 font-medium">從使用到認識</span>
+                            </div>
+                            <ul class="text-xs space-y-2 text-slate-700 dark:text-slate-300">
+                                <li><strong>運用AI學習：</strong>理解基本原理，修正產出內容，會交叉查證</li>
+                                <li><strong>負責任使用AI：</strong>正確標註來源，能辨識生成內容，不濫用</li>
+                                <li><strong>運用AI解決問題：</strong>判斷適合用AI解決的問題，可整合產出</li>
+                                <li><strong>AI無法取代能力：</strong>展現使用AI的主動性與主導性</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 rounded-full bg-purple-200 text-purple-800 dark:bg-purple-900 dark:text-purple-200 text-xs font-bold">高中階段</span>
+                                <span class="text-xs text-purple-600 dark:text-purple-400 font-medium">從使用到協作</span>
+                            </div>
+                            <ul class="text-xs space-y-2 text-slate-700 dark:text-slate-300">
+                                <li><strong>運用AI學習：</strong>理解功能與限制，能用進階AI工具自主學習</li>
+                                <li><strong>負責任使用AI：</strong>具備數位安全與倫理素養，正確標註協作情形</li>
+                                <li><strong>運用AI解決問題：</strong>能架構問題，與AI人機協作以解決問題</li>
+                                <li><strong>AI無法取代能力：</strong>展現同理心與創造力，進行獨立自主判斷</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 臺灣中小學教師與學生 AI 素養能力總表 -->
+                    <div class="pt-6 border-t border-slate-200 dark:border-slate-700">
+                        <h4 class="text-base font-bold text-slate-900 dark:text-white mb-2">臺灣中小學教師與學生 AI 素養架構（共通靈魂：以人為中心）</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600">
+                                <h5 class="font-bold text-sky-600 dark:text-sky-400 text-sm mb-2 flex items-center gap-1.5">
+                                    <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                                    <span>教師端 AI 素養（確保專業能動性）</span>
+                                </h5>
+                                <p class="mb-2 text-slate-500">涵蓋 4 大維度：倫理 (AI倫理)、技術 (AI基礎與技術)、教學 (AI賦能教學)、發展 (AI促進教師專業發展)</p>
+                                <div class="space-y-1.5 text-slate-700 dark:text-slate-300">
+                                    <div>• <strong>取得理解：</strong>掌握AI運作倫理、基礎知識、輔助教學適用性與自我增能</div>
+                                    <div>• <strong>深化應用：</strong>內化教學責任、選用適性工具、整合教學法、數據分析發展</div>
+                                    <div>• <strong>創造轉型：</strong>創新倫理模式、建構自動化工作、促進教學轉型、創建共學文化</div>
+                                </div>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600">
+                                <h5 class="font-bold text-indigo-600 dark:text-indigo-400 text-sm mb-2 flex items-center gap-1.5">
+                                    <i data-lucide="user-check" class="w-4 h-4"></i>
+                                    <span>學生端 AI 素養（捍衛學習者能動性）</span>
+                                </h5>
+                                <p class="mb-2 text-slate-500">涵蓋 4 大維度：倫理 (AI倫理)、技術 (AI基礎與技術)、學習 (AI賦能學習)、設計 (AI系統設計)</p>
+                                <div class="space-y-1.5 text-slate-700 dark:text-slate-300">
+                                    <div>• <strong>取得理解：</strong>批判思考與取捨、理解運作原理、認識輔助角色、掌握設計方法</div>
+                                    <div>• <strong>深化應用：</strong>落實規範與隱私、提示詞優化互動、掌握領域學習策略、實踐系統開發</div>
+                                    <div>• <strong>創造轉型：</strong>深化設計倫理、以人為中心專案、賦能自主學習、解決真實問題</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- 頁尾 -->
+        <footer class="mt-auto border-t border-slate-200/80 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 py-6 text-center text-xs text-slate-400 space-y-1">
+            <p>© 2026 AI導入課程與評量知識庫 · 南投縣史港國小 施君潔主任 講授</p>
+            <p>設計精神：AI 是鷹架不是拐杖 · 確保學習者與教師的能動性</p>
+        </footer>
+    </div>
+
+    <!-- ==================== 互動邏輯 JavaScript ==================== -->
+    <script>
+        // 1. 知識庫資料結構 (完整收錄 20 頁投影片精華)
+        const KNOWLEDGE_ITEMS = [
+            // 核心理念與實證
+            {
+                id: 'scaffold-vs-crutch',
+                category: 'theory',
+                categoryName: '核心理念',
+                badgeColor: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300',
+                title: '拐杖 V.S. 鷹架（典範轉移）',
+                subtitle: '從「工具示範」走向「課程轉譯 × 教學領導」',
+                quote: '「AI 是鷹架，不是拐杖。產出漂亮不等於學會，撤除 AI 後的獨立能力才是真正的學習證據。」',
+                content: '傳統取向（Before - 拐杖）只教哪個平台、抄提示詞、單次 40 分鐘破碎活動、以產出表面效度評估；深度取向（After - 鷹架）聚焦領域核心能力、設計適切角色與查證任務、以共備觀議課深化教學、追蹤無 AI 遷移與治理風險。',
+                tags: ['鷹架', '拐杖', '典範轉移', '課程轉譯', '核心理念'],
+                action: '教學時問自己：學生是在靠 AI 撐著走（拐杖），還是在 AI 支持下學會自己走（鷹架）？'
+            },
+            {
+                id: 'research-bastani',
+                category: 'theory',
+                categoryName: '實證研究',
+                badgeColor: 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300',
+                title: 'Bastani 等人 (2025) 數學教學實證',
+                subtitle: '近千名高中數學學生的實地研究',
+                quote: '「移除 AI 後，學生成績反而比未使用 AI 者低 17%！」',
+                content: '實地研究發現，學生使用一般生成式 AI 時，練習期間作答表現雖然提升，但移除 AI 後成績大幅下滑 17%。唯有設有「教學護欄（Guardrails）」的 AI 家教，才能有效降低這種負面依賴效應。',
+                tags: ['Bastani', '實證研究', '教學護欄', '成績倒退', '依賴性'],
+                action: '必須設計有護欄的引導，絕不能讓學生直接獲取題目解法。'
+            },
+            {
+                id: 'research-darvishi',
+                category: 'theory',
+                categoryName: '實證研究',
+                badgeColor: 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300',
+                title: 'Darvishi 等人 (2024) 同儕回饋研究',
+                subtitle: '10 門課程、1,625 名學生的隨機對照研究',
+                quote: '「AI 提示能改善當下表現，但移除後無法維持，反映學生僅依賴 AI 而未內化。」',
+                content: '研究顯示，AI 提示可以改善學生當下的同儕回饋表現，但一旦移除提示，部分學生無法維持相同品質，證實學生可能只是表面依從 AI 指引，學習策略並未真正深層內化。',
+                tags: ['Darvishi', '同儕回饋', '內化', '隨機對照', '學習策略'],
+                action: '安排學生在無提示的情境下重複練習，檢核策略是否真正內化。'
+            },
+            {
+                id: 'research-fan',
+                category: 'theory',
+                categoryName: '實證研究',
+                badgeColor: 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300',
+                title: 'Fan 等人 (2025) 寫作實驗與後設認知',
+                subtitle: '117 名大學生的寫作實證研究',
+                quote: '「過度依賴 AI 可能減少規劃、監控與評估，形成【後設認知懶惰】。」',
+                content: '雖然使用 ChatGPT 組的文章表面分數進步較明顯，但在實質知識增長與學習遷移方面並無優勢。學生把高階思維外包給 AI，導致大腦停止自主監控與評估。',
+                tags: ['Fan', '後設認知懶惰', '寫作實驗', '學習遷移', '外包思考'],
+                action: '在寫作課中要求學生先構思大綱、標注修訂理由，避免直接全篇生成。'
+            },
+            {
+                id: 'sync-model',
+                category: 'theory',
+                categoryName: '理論模型',
+                badgeColor: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300',
+                title: 'SYNC 人機學習模型 (Fan 等人, 2026)',
+                subtitle: '人機協同學習與獨立能力檢驗理論架構',
+                quote: '「在 AI 協助下完成高品質作品，僅代表『任務表現』，不代表『持久學習』。」',
+                content: '應透過：(1) 逐步減少 AI 鷹架、(2) 無 AI 重述、(3) 新情境遷移任務，來嚴謹檢驗學生是否真正形成獨立解決問題的能力。',
+                tags: ['SYNC模型', '任務表現', '持久學習', '遷移任務', '鷹架撤除'],
+                action: '在教案末端務必設計「無 AI 獨立遷移任務」作為終結性評量。'
+            },
+            {
+                id: 'dragan-gasevic',
+                category: 'theory',
+                categoryName: '國際論壇',
+                badgeColor: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300',
+                title: 'Dragan Gašević 國際數位學習論壇 (2026)',
+                subtitle: 'Building Human Capability for Productive Human-AI Interaction',
+                quote: '「Ask what learners can do when AI support is reduced.」',
+                content: '伴隨 AI 時的「任務表現（Task Performance）」並不是衡量學習成功的唯一依據；當 AI 支援撤減（Reduced Support）時，檢視學生的實質學習（Learning）、知識遷移（Transfer）與自我調節能力（Regulatory Capacity）。',
+                tags: ['Dragan Gašević', '國際論壇', 'Reduced support', '自我調節'],
+                action: '課堂最後 10 分鐘蓋上螢幕，讓學生脫離 AI 進行獨立表達。'
+            },
+
+            // 六個提問
+            {
+                id: 'q1-what-to-learn',
+                category: 'questions',
+                categoryName: '六大提問',
+                badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                title: '01. 學什麼？',
+                subtitle: '檢視領域核心本質目標',
+                quote: '「學生必須獨立理解或能做出的領域目標是什麼？」',
+                content: '在規劃任何 AI 活動前，教師必須先抽離科技，確立教學本質。若將 AI 完全移除，這堂課的核心能力與學習成效依然清晰具體嗎？AI 不得喧賓奪主。',
+                tags: ['學什麼', '核心目標', '領域本質', '六大提問'],
+                action: '在學習單頂端明確寫下學科學習目標（而非 AI 工具操作目標）。'
+            },
+            {
+                id: 'q2-why-ai',
+                category: 'questions',
+                categoryName: '六大提問',
+                badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                title: '02. 為何用 AI？',
+                subtitle: '評估科技增益的真實價值',
+                quote: '「AI 增加了何種回饋、比較、模擬或表達的機會？」',
+                content: '使用 AI 必須帶來超越傳統課堂的附加價值（例如：即時多元觀點比對、蘇格拉底式追問、跨語境模擬對話），如果傳統紙筆或板書能做得更好，就無需盲目導入。',
+                tags: ['為何用AI', '回饋', '模擬', '多元觀點', '六大提問'],
+                action: '列出 1~2 項這堂課非用 AI 不可的「獨特教學回饋契機」。'
+            },
+            {
+                id: 'q3-who-thinks',
+                category: 'questions',
+                categoryName: '六大提問',
+                badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                title: '03. 誰負責思考？',
+                subtitle: '捍衛學生大腦認知責任',
+                quote: '「哪些步驟必須由學生先想、選擇、解釋與修正？」',
+                content: '嚴禁將「形成問題、判斷論點、邏輯推理」等高階思考責任外包給 AI。AI 只能作為陪練夥伴，大腦的認知重量必須牢牢留在學生身上。',
+                tags: ['誰負責思考', '認知責任', '自主思考', '六大提問'],
+                action: '明確規範第一步「先想」：在開啟對話框前，紙筆寫出自己的第一版答案。'
+            },
+            {
+                id: 'q4-how-to-verify',
+                category: 'questions',
+                categoryName: '六大提問',
+                badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                title: '04. 如何查證？',
+                subtitle: '落實批判性交叉檢驗',
+                quote: '「要用哪些課本、實驗、資料庫或多重來源進行比對？」',
+                content: 'AI 生成內容極易出現幻覺與偏誤。教學設計中必須強制設計查證步驟，要求學生使用指定課本頁碼、學術資料庫或一手實驗數據進行嚴謹比對。',
+                tags: ['如何查證', '交叉比對', '幻覺防範', '證據導向', '六大提問'],
+                action: '在學習單上設計「查證對照表」：AI 的主張 vs 課本第幾頁的證據。'
+            },
+            {
+                id: 'q5-how-to-disclose',
+                category: 'questions',
+                categoryName: '六大提問',
+                badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                title: '05. 如何揭露？',
+                subtitle: '學術誠信與協作透明化',
+                quote: '「學生要保留哪些提問、回應、採納與改寫的紀錄？」',
+                content: '培養負責任的 AI 使用習慣。學生必須學會揭露人機協作範圍，包含使用的提示詞 (Prompt)、AI 建議、採納與否的理由，以及最後的自主改寫痕跡。',
+                tags: ['如何揭露', '學術誠信', '歷程紀錄', '協作透明', '六大提問'],
+                action: '作品末端附上「AI 協作揭露宣告」：標記 AI 貢獻處與個人原創處。'
+            },
+            {
+                id: 'q6-how-to-prove',
+                category: 'questions',
+                categoryName: '六大提問',
+                badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                title: '06. 如何證明學會？',
+                subtitle: '無 AI 情境下的遷移檢核',
+                quote: '「不用 AI 時，能否口說、紙筆或在新情境獨立完成？」',
+                content: '最關鍵的評量指標！只有當移除所有數位工具與 AI 提示時，學生仍能以口語向同儕解釋核心概念、在新題型中順利推論，才代表真學習發生。',
+                tags: ['如何證明學會', '獨立遷移', '脫離AI', '學習成效', '六大提問'],
+                action: '下課前 5 分鐘進行「脫離 AI 口說抽測」或紙筆快問快答。'
+            },
+
+            // 課堂六流程
+            {
+                id: 'wf-1-think',
+                category: 'workflow',
+                categoryName: '課堂六部曲',
+                badgeColor: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300',
+                title: 'Step 1. 先想',
+                subtitle: '保留自主思考空間',
+                quote: '教師引導語：「你原本怎麼想？」',
+                content: '在啟動 AI 對話前，學生必須先自行作答、預測結果，或在筆記本列出自己的已知與未知，啟動先備知識與自主認知迴路。',
+                tags: ['先想', '課堂流程', '已知未知', '自主作答'],
+                action: '「請在紙上先寫下你的直覺解答，寫完才能點開 AI 畫面！」'
+            },
+            {
+                id: 'wf-2-ask',
+                category: 'workflow',
+                categoryName: '課堂六部曲',
+                badgeColor: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300',
+                title: 'Step 2. 再問',
+                subtitle: '目的導向精準提問',
+                quote: '教師引導語：「你這次提問想要解決什麼？不要直接索取成品！」',
+                content: '帶著明確的學習目的與思考瓶頸向 AI 提問，要求它扮演蘇格拉底、辨析概念或提供線索，嚴禁直接輸入「請幫我寫出答案」。',
+                tags: ['再問', '課堂流程', '精準提問', '提示詞'],
+                action: '提示範例：「我是國小六年級學生，這段話我不懂，請用三個提問引導我思考。」'
+            },
+            {
+                id: 'wf-3-verify',
+                category: 'workflow',
+                categoryName: '課堂六部曲',
+                badgeColor: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300',
+                title: 'Step 3. 查證',
+                subtitle: '比對課本與多重來源',
+                quote: '教師引導語：「AI 的哪句話有證據？在哪一頁？」',
+                content: '將 AI 給出的資訊視為「待驗證的假設」，主動翻開課本、查閱指定資料庫或進行實驗驗證，抓出可能存在的幻覺或語病。',
+                tags: ['查證', '課堂流程', '翻閱課本', '檢驗證據'],
+                action: '「請在 AI 的回答中畫出三處關鍵論點，並在課本中找到相對應句子打勾。」'
+            },
+            {
+                id: 'wf-4-eliminate',
+                category: 'workflow',
+                categoryName: '課堂六部曲',
+                badgeColor: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300',
+                title: 'Step 4. 取捨',
+                subtitle: '說出採納與修正理由',
+                quote: '教師引導語：「你改了什麼？為什麼刪除 AI 那句話？」',
+                content: '學生必須展現主體性，說明自己選擇採納 AI 的哪項建議、果斷拒絕了哪句胡扯，以及基於什麼理由進行自主文字重組。',
+                tags: ['取捨', '課堂流程', '批判思考', '文字修改'],
+                action: '「在學習單上寫下一句你拒絕採納 AI 的理由。」'
+            },
+            {
+                id: 'wf-5-disclose',
+                category: 'workflow',
+                categoryName: '課堂六部曲',
+                badgeColor: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300',
+                title: 'Step 5. 揭露',
+                subtitle: '標註人機協作軌跡',
+                quote: '教師引導語：「請標記哪些是你寫的，哪些來自 AI 協作。」',
+                content: '誠實且完整地記錄協作歷程，螢幕截圖保存關鍵 Prompt，在作業末尾清楚陳述人機分工界線，培養數位誠信與治理素養。',
+                tags: ['揭露', '課堂流程', '標註協作', '數位誠信'],
+                action: '「用不同顏色螢光筆標記：黃色是個人原創，藍色是 AI 啟發。」'
+            },
+            {
+                id: 'wf-6-detach',
+                category: 'workflow',
+                categoryName: '課堂六部曲',
+                badgeColor: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300',
+                title: 'Step 6. 脫離',
+                subtitle: '無 AI 獨立遷移與表達',
+                quote: '教師引導語：「現在不看 AI，再說一次！」',
+                content: '關閉平板或蓋上筆電，由學生以自己的語言向同學說明解題思考，或當場作答一題全新但概念相同的變形題，完成知識內化閉環。',
+                tags: ['脫離', '課堂流程', '合上筆電', '獨立重述', '遷移'],
+                action: '「請轉身跟隔壁夥伴，用你自己的話把這個概念講給他聽！」'
+            },
+
+            // 七項學習設計指標
+            {
+                id: 'ind-1-goal',
+                category: 'indicators',
+                categoryName: '7項指標',
+                badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+                title: '指標 1：目標一致',
+                subtitle: 'Directly Serves Learning Goal',
+                quote: '「AI 活動是否直接服務領域學習目標？若移除 AI，核心目標仍清楚嗎？」',
+                content: '避免為用而用。科技工具必須緊扣課綱領域核心素養與學習重點，不得讓花俏功能分散核心學習焦點。',
+                tags: ['指標1', '目標一致', '課綱本位', '七項指標'],
+                action: '檢核教案中 AI 任務是否能直接對應到該課學習目標代碼。'
+            },
+            {
+                id: 'ind-2-cognition',
+                category: 'indicators',
+                categoryName: '7項指標',
+                badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+                title: '指標 2：認知責任',
+                subtitle: 'Preserving Cognitive Responsibility',
+                quote: '「學生是否先想、作選擇、說理由，而非直接取得完成品？」',
+                content: '確保學生是課堂中的主動思考者與決策者。所有決策、取捨與推論過程必須由學生親自執行並陳述理由。',
+                tags: ['指標2', '認知責任', '拒絕直接成品', '七項指標'],
+                action: '學習單設計先填寫思考空格，再開啟工具。'
+            },
+            {
+                id: 'ind-3-verification',
+                category: 'indicators',
+                categoryName: '7項指標',
+                badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+                title: '指標 3：查證品質',
+                subtitle: 'Verification Quality & Evidence',
+                quote: '「是否使用課本、數據、實驗或可靠來源檢核 AI 內容？」',
+                content: '提供多元可靠的檢核參照物，如教科書權威文本、政府統計資料、實驗量測數值，建立實事求是的科學態度。',
+                tags: ['指標3', '查證品質', '數據檢驗', '七項指標'],
+                action: '課堂備妥輔助查證的紙本圖書或官方資料庫清單。'
+            },
+            {
+                id: 'ind-4-agency',
+                category: 'indicators',
+                categoryName: '7項指標',
+                badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+                title: '指標 4：人類主體性',
+                subtitle: 'Human Agency & Voice',
+                quote: '「學生能否拒絕、修正 AI 建議並維持自己的觀點與創作意圖？」',
+                content: '防止學生的個人情感、價值觀與獨特創作靈魂被平庸的演算法抹平。引導學生捍衛個人風格與原創觀點。',
+                tags: ['指標4', '人類主體性', '自主觀點', '創作意圖', '七項指標'],
+                action: '在作文評量中加入「個人原創觀點」專項評分指標。'
+            },
+            {
+                id: 'ind-5-differentiation',
+                category: 'indicators',
+                categoryName: '7項指標',
+                badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+                title: '指標 5：差異化支持',
+                subtitle: 'Differentiated Scaffolding',
+                quote: '「不同基礎、語言、設備與自律程度的學生是否有不同鷹架？」',
+                content: '對低成就學生提供基礎語句提示詞與詞庫輔助；對高成就學生提供挑戰性辯證與跨領域情境任務，落實因材施教。',
+                tags: ['指標5', '差異化支持', '鷹架層次', '因材施教', '七項指標'],
+                action: '準備 A（基礎引導）、B（進階探究）兩種不同深度的 Prompt 卡。'
+            },
+            {
+                id: 'ind-6-independence',
+                category: 'indicators',
+                categoryName: '7項指標',
+                badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+                title: '指標 6：獨立學習',
+                subtitle: 'Independent Learning & Transfer',
+                quote: '「是否安排無 AI 口說、紙筆、實作或新情境遷移？」',
+                content: '落實學習評估的真正閉環。必須在教學單元結尾安排學生完全不依賴 AI 即可獨立完成的評量關卡。',
+                tags: ['指標6', '獨立學習', '無AI評量', '七項指標'],
+                action: '單元總結測驗嚴格規定不使用任何連網與 AI 工具。'
+            },
+            {
+                id: 'ind-7-safety',
+                category: 'indicators',
+                categoryName: '7項指標',
+                badgeColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+                title: '指標 7：安全與責任',
+                subtitle: 'Safety, Ethics & Governance',
+                quote: '「個資、年齡、著作權、揭露、偏誤與不當內容是否被處理？」',
+                content: '嚴守校園數位安全防線。指導學生不輸入姓名電話等個資、確認工具年齡條款、注重智慧財產權與辨識演算法偏見。',
+                tags: ['指標7', '安全與責任', '隱私保護', '倫理合規', '七項指標'],
+                action: '課前建立「個資安全防護三不」口訣：不輸姓名、不輸地址、不傳私照。'
+            },
+
+            // 國語文閱讀理解指導策略
+            {
+                id: 'chinese-locate',
+                category: 'chinese',
+                categoryName: '國語文實作',
+                badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                title: '閱讀理解 Step 1：找線索 (Locate)',
+                subtitle: '定位文章關鍵句段與邏輯標記',
+                quote: '「看題目問什麼意思，回到文章找相關句子或段落！」',
+                content: '指導學生精準標記因果與轉折關鍵詞（因為、所以、其實、但是、這、他）。在與 AI 協作時，要求學生先提供原文定位句子，而非讓 AI 自行抓取。',
+                tags: ['找線索', 'Locate', '國語文', '閱讀理解', '學力測驗'],
+                action: '用螢光筆在文本中圈出題幹關鍵字對應的原句。'
+            },
+            {
+                id: 'chinese-paraphrase',
+                category: 'chinese',
+                categoryName: '國語文實作',
+                badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                title: '閱讀理解 Step 2：轉換說法 (Paraphrase)',
+                subtitle: '避開照抄原句，換句話說',
+                quote: '「用自己的話把句意清楚說一次，改用同義詞或簡化句型！」',
+                content: '理解的核心指標在於「換句話說」。如果學生只能複製原句，代表並未真正理解。讓學生把長句拆解成主詞與動詞，用口語白話重述一次。',
+                tags: ['轉換說法', 'Paraphrase', '換句話說', '國語文', '閱讀理解'],
+                action: '引導語：「如果要把這句話講給三年級小朋友聽，你會怎麼說？」'
+            },
+            {
+                id: 'chinese-eliminate',
+                category: 'chinese',
+                categoryName: '國語文實作',
+                badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                title: '閱讀理解 Step 3：刪除次要資訊 (Eliminate)',
+                subtitle: '使用排除法過濾干擾選項',
+                quote: '「先刪掉不可能、不合常理與偏離主題的選項！」',
+                content: '面對學力測驗選擇題，教導學生辨析選項中的誇大詞、無中生有或偷換概念之處，果斷刪除無關細節，縮小思考範圍。',
+                tags: ['刪除次要資訊', 'Eliminate', '排除法', '國語文', '選項分析'],
+                action: '在題本選項上直接用筆打叉，並在旁邊寫下排除的原因。'
+            },
+            {
+                id: 'chinese-match',
+                category: 'chinese',
+                categoryName: '國語文實作',
+                badgeColor: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                title: '閱讀理解 Step 4：比對選項 (Match)',
+                subtitle: '精準比對心智理解與選項',
+                quote: '「將自己理解的意思與選項逐一比對，找出最接近的答案！」',
+                content: '拿剛剛第二步「自己換句話說」的結論，去跟剩下的選項進行語意比對。不是盲目靠直覺猜測，而是有理有據的邏輯扣合。',
+                tags: ['比對選項', 'Match', '語意比對', '國語文', '解題思維'],
+                action: '「確認這個選項是不是最符合你剛剛自己講的那句話？」'
+            },
+
+            // 講師簡介與資歷
+            {
+                id: 'author-profile',
+                category: 'author',
+                categoryName: '講師簡介',
+                badgeColor: 'bg-slate-200 text-slate-800 dark:bg-slate-700 dark:text-slate-200',
+                title: '施君潔 主任 專業簡歷',
+                subtitle: '南投縣史港國小教導主任 · 教育部數位學習輔導專家',
+                quote: '「具備行政領導力與十餘年教學現場經驗，長期深耕數位化國語文課程與生成式 AI 教學應用。」',
+                content: '• 榮譽：114年度教育部推動數位學習績優中小學「卓越獎」、因材網A2績優講師「典範獎」、111學年度教育部績優「特優」、多次教育部與南投縣優良教案「特優」\n• 經歷：教育部因材網國語文輔導委員、教育部5G智慧學習/BYOD輔導專家、南投縣輔導團國語文輔導員\n• 專書：《科技輔助自主學習理論與應用：「自學共學互學導學」教師行動指南》(2023 共同作者)',
+                tags: ['施君潔', '史港國小', '南投縣', '卓越獎', '因材網', '講師簡歷'],
+                action: '信箱：t09139.ntct@go.edu.tw ｜ 電話：049-2931521 #30'
+            }
+        ];
+
+        // 2. 課堂六部曲流程資料
+        const STEPS_DATA = [
+            {
+                stepNum: '01',
+                title: '先想',
+                subtitle: '保留自主思考與認知投入',
+                desc: '在接觸 AI 前，學生先自行嘗試作答、推測因果，或列出已知與未知的概念，確立個人原始思路。',
+                studentTask: '在筆記本或學習單上，寫下自己的直覺答案與思路，不允許直接開啟 AI 對話。',
+                teacherPrompt: '「你原本怎麼想？請先在紙上記下你的第一個版本！」',
+                promptTemplate: '【提問前自我檢核】：這道題目的核心問題是什麼？我目前的猜測是……；我不確定的地方是……'
+            },
+            {
+                stepNum: '02',
+                title: '再問',
+                subtitle: '目的導向，不直接索取成果',
+                desc: '帶著明確的學習目的向 AI 提問，要求引導或給予思考線索，而不是當「鍵盤小偷」直接要答案。',
+                studentTask: '撰寫結構化提示詞，要求 AI 扮演引導教練（Coach）或批判同儕（Critical Friend）。',
+                teacherPrompt: '「你這次提問想要解決什麼？請不要直接問答案，請它給你線索！」',
+                promptTemplate: '我正在學習【單元主題】。針對【疑惑點】，請不要直接告訴我答案，請用 2 個引導問題幫助我思考。'
+            },
+            {
+                stepNum: '03',
+                title: '查證',
+                subtitle: '對照課本與權威多重來源',
+                desc: '將 AI 生成內容當作「未經證實的觀點」，透過教科書、實驗數據或官方權威資料庫交叉比對。',
+                studentTask: '翻閱課本指定頁面或查詢權威網站，找出能夠支持或反駁 AI 內容的具體文句與數據。',
+                teacherPrompt: '「AI 的哪句話有證據？課本第幾頁有寫？有沒有幻覺？」',
+                promptTemplate: 'AI 宣稱【論點 A】，但我查閱課本第【X】頁指出【論點 B】，這兩者之間的差異是……'
+            },
+            {
+                stepNum: '04',
+                title: '取捨',
+                subtitle: '具體說出採納與修正理由',
+                desc: '對 AI 的建議進行篩選與重組，清楚陳述「我接受了什麼、改了什麼、刪了什麼，以及為什麼」。',
+                studentTask: '在作品修訂稿中標記修改軌跡，並在反思欄寫出拒絕 AI 某項說法的專業理由。',
+                teacherPrompt: '「你改了什麼？為什麼刪掉 AI 給你的那一整段？你的判斷是什麼？」',
+                promptTemplate: '我採納了 AI 關於【X】的提示，因為符合課本定義；但我刪除了【Y】，因為偏離了本文主旨。'
+            },
+            {
+                stepNum: '05',
+                title: '揭露',
+                subtitle: '落實數位誠信與協作歷程保存',
+                desc: '完整標記人機協作範圍，保存關鍵對話紀錄與 Prompt 截圖，對自己的最終產出負起完全責任。',
+                studentTask: '在作業附錄貼上提示詞歷程，並使用色彩標記個人原創與 AI 啟發的區塊。',
+                teacherPrompt: '「請標註哪部分是你的想法，哪部分是 AI 協作，誠實揭露！」',
+                promptTemplate: '【AI 協作聲明】：本作品由本人獨立構思大綱，使用【工具名】輔助修飾詞句，關鍵提示詞為……'
+            },
+            {
+                stepNum: '06',
+                title: '脫離',
+                subtitle: '合上螢幕，獨立重述與新情境遷移',
+                desc: '移開所有 AI 介面，完全依靠大腦內化的知識進行口頭重述、紙筆手寫或遷移作答全新情境題目。',
+                studentTask: '蓋上筆電或關閉螢幕，向同學或老師用自己的話口頭完整解釋核心概念，或作答遷移題。',
+                teacherPrompt: '「現在不看 AI，把電腦轉過去，用你自己的話再說一次！」',
+                promptTemplate: '【脫離檢驗】：完全不看工具，用 100 字以內向同儕解釋本次學習的核心觀念：……'
+            }
+        ];
+
+        // 3. 七項學習指標資料
+        const CHECKLIST_DATA = [
+            { id: 1, name: '目標一致', desc: 'AI 活動是否直接服務領域學習目標？若移除 AI，核心學習目標仍然清楚完整嗎？' },
+            { id: 2, name: '認知責任', desc: '學生是否先想、作選擇、說理由，而非跳過大腦直接取得完成品？' },
+            { id: 3, name: '查證品質', desc: '是否安排並落實使用課本、數據、實驗或可靠來源檢核 AI 生成內容？' },
+            { id: 4, name: '人類主體性', desc: '學生能否拒絕、修正 AI 建議，並維持自己的獨特觀點與創作意圖？' },
+            { id: 5, name: '差異化支持', desc: '針對不同基礎、語言、設備與自律程度的學生，是否有層次不同的支援鷹架？' },
+            { id: 6, name: '獨立學習', desc: '課堂是否確實安排「無 AI 口說、紙筆、實作或新情境任務」以檢驗知識內化？' },
+            { id: 7, name: '安全與責任', desc: '個人隱私、年齡規範、著作權法規、協作揭露、AI 偏誤與不當內容是否被妥善處置？' }
+        ];
+
+        // 4. Bloom 認知層次資料 (Schober 2025 BLOOM-AI)
+        const BLOOM_DATA = [
+            {
+                level: '記憶 (Remember)',
+                badge: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300',
+                ability: '從大腦記憶中主動提取，或從選項中精確辨認核心事實。',
+                rule: '【絕不能外包】：沒有 AI 提示時，仍能獨立回憶與辨認核心知識，不是全靠 AI 提醒才想得起來！',
+                chineseExample: '字音、字形、部首、詞義、筆順、詞類與基本文法規則。'
+            },
+            {
+                level: '理解 (Understand)',
+                badge: 'bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300',
+                ability: '選擇重要線索，辨別重要與次要資訊，能用自己的話解釋。',
+                rule: '【絕不能外包】：用自己的話詮釋文意，不是直接複製貼上 AI 生成的摘要！',
+                chineseExample: '段落大意、指涉對象、因果關係、人物心情、舉例說明的核心目的。'
+            },
+            {
+                level: '應用 (Apply)',
+                badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+                ability: '提取規則 ➔ 辨識情境 ➔ 套用與轉換，在新情境中獨立選用規則。',
+                rule: '【絕不能外包】：在新情境中獨立判斷並正確套用規則，不是照著 AI 範例生搬硬套！',
+                chineseExample: '句型造句、複句關係、修辭技巧、詞語搭配在新語境中的靈活運用與改寫。'
+            },
+            {
+                level: '分析 (Analyze)',
+                badge: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                ability: '整合多個線索，辨識因果、對比與論證關係，提出有證據的推論。',
+                rule: '【絕不能外包】：親自引用文本或資料證據，說明推論與排除過程，不是直接採用 AI 提出的推論！',
+                chineseExample: '深層文意推論、篇章結構分析、作者寫作意圖、論點與論據支撐、修辭藝術效果。'
+            },
+            {
+                level: '評估 (Evaluate)',
+                badge: 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300',
+                ability: '比較多種解釋，查證來源與證據，做出有充分理由的判斷。',
+                rule: '【絕不能外包】：查證 AI 與外部觀點，說明採納或拒絕的客觀理由，不是把 AI 答案當作聖旨！',
+                chineseExample: '選項正誤評析、證據可信度檢驗、不同作者觀點比較、AI 回饋之適切性查證。'
+            },
+            {
+                level: '創造 (Create)',
+                badge: 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300',
+                ability: '設定明確目的、整合多方資訊，產出有意義的作品，並能完整說明創作決策。',
+                rule: '【絕不能外包】：設定創作意圖、重組架構，並說明自己的設計決策，不是全盤接受 AI 生成的完整文章！',
+                chineseExample: '自主設計閱讀測驗題目、多角度改寫文本、重組各方觀點，撰寫有理有據的議論文章。'
+            }
+        ];
+
+        // 狀態管理
+        let currentCategory = 'all';
+        let searchQuery = '';
+        let currentStep = 0;
+        let checkedIndicators = new Set();
+        let selectedBloomIndex = 5;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            checkAuth();
+            renderCards();
+            renderChecklist();
+            setStep(0);
+            selectBloom(5);
+        });
+
+        // ==================== 身份驗證邏輯 (密碼 049) ====================
+        function checkAuth() {
+            const isAuth = sessionStorage.getItem('shih_ai_curriculum_auth');
+            if (isAuth === 'granted') {
+                document.getElementById('auth-gate').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+            } else {
+                document.getElementById('auth-gate').classList.remove('hidden');
+                document.getElementById('app-container').classList.add('hidden');
+            }
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('pwd-input').value.trim();
+            const errEl = document.getElementById('auth-err');
+            const cardEl = e.target.parentElement;
+
+            if (input === '049') {
+                sessionStorage.setItem('shih_ai_curriculum_auth', 'granted');
+                document.getElementById('auth-gate').classList.add('opacity-0');
+                setTimeout(() => {
+                    document.getElementById('auth-gate').classList.add('hidden');
+                    document.getElementById('app-container').classList.remove('hidden');
+                    lucide.createIcons();
+                }, 300);
+            } else {
+                errEl.classList.remove('opacity-0');
+                cardEl.classList.add('shake');
+                setTimeout(() => cardEl.classList.remove('shake'), 500);
+                document.getElementById('pwd-input').value = '';
+                document.getElementById('pwd-input').focus();
+            }
+        }
+
+        function lockApp() {
+            sessionStorage.removeItem('shih_ai_curriculum_auth');
+            document.getElementById('pwd-input').value = '';
+            document.getElementById('auth-gate').classList.remove('opacity-0');
+            document.getElementById('auth-gate').classList.remove('hidden');
+            document.getElementById('app-container').classList.add('hidden');
+        }
+
+        // ==================== 視圖切換 ====================
+        function switchView(viewName) {
+            const views = ['cards', 'stepper', 'checklist', 'bloom', 'matrix'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                const btn = document.getElementById(`view-btn-${v}`);
+                if (v === viewName) {
+                    el.classList.remove('hidden');
+                    btn.classList.add('bg-white', 'dark:bg-slate-800', 'text-sky-600', 'dark:text-sky-400', 'font-semibold', 'shadow-sm');
+                    btn.classList.remove('text-slate-600', 'dark:text-slate-300');
+                } else {
+                    el.classList.add('hidden');
+                    btn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-sky-600', 'dark:text-sky-400', 'font-semibold', 'shadow-sm');
+                    btn.classList.add('text-slate-600', 'dark:text-slate-300');
+                }
+            });
+            lucide.createIcons();
+        }
+
+        // ==================== 搜尋與分類篩選 ====================
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-pill').forEach(btn => {
+                if (btn.getAttribute('data-category') === cat) {
+                    btn.classList.add('bg-slate-900', 'dark:bg-sky-600', 'text-white', 'font-medium', 'shadow-sm');
+                    btn.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-600', 'dark:text-slate-300');
+                } else {
+                    btn.classList.remove('bg-slate-900', 'dark:bg-sky-600', 'text-white', 'font-medium', 'shadow-sm');
+                    btn.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-600', 'dark:text-slate-300');
+                }
+            });
+            document.getElementById('active-filter-label').innerText = 
+                cat === 'all' ? '全部主題' : 
+                cat === 'theory' ? '核心理念與實證' :
+                cat === 'questions' ? '六大課堂提問' :
+                cat === 'workflow' ? '學生課堂六部曲' :
+                cat === 'indicators' ? '七項學習設計指標' :
+                cat === 'bloom' ? 'Bloom 不能外包能力' :
+                cat === 'chinese' ? '國語文閱讀理解策略' :
+                cat === 'framework' ? '教育部 AI 能力圖像' : '講師簡介';
+            renderCards();
+        }
+
+        function handleSearch(val) {
+            searchQuery = val.trim().toLowerCase();
+            const clearBtn = document.getElementById('clear-search');
+            if (searchQuery.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            renderCards();
+        }
+
+        function clearSearch() {
+            searchQuery = '';
+            document.getElementById('search-input').value = '';
+            document.getElementById('clear-search').classList.add('hidden');
+            renderCards();
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            const noRes = document.getElementById('no-results');
+            document.getElementById('count-all').innerText = KNOWLEDGE_ITEMS.length;
+
+            const filtered = KNOWLEDGE_ITEMS.filter(item => {
+                const matchCat = currentCategory === 'all' || item.category === currentCategory;
+                const matchSearch = searchQuery === '' || 
+                    item.title.toLowerCase().includes(searchQuery) ||
+                    item.subtitle.toLowerCase().includes(searchQuery) ||
+                    item.quote.toLowerCase().includes(searchQuery) ||
+                    item.content.toLowerCase().includes(searchQuery) ||
+                    item.tags.some(t => t.toLowerCase().includes(searchQuery)) ||
+                    (item.action && item.action.toLowerCase().includes(searchQuery));
+                return matchCat && matchSearch;
+            });
+
+            document.getElementById('results-count').innerText = filtered.length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                noRes.classList.remove('hidden');
+                return;
+            }
+
+            noRes.classList.add('hidden');
+            container.innerHTML = filtered.map(item => `
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-sky-300 dark:hover:border-sky-700 transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <span class="text-xs px-2.5 py-1 rounded-full font-semibold ${item.badgeColor}">
+                                ${item.categoryName}
+                            </span>
+                            <span class="text-xs font-mono text-slate-400">#${item.id}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1 leading-snug">
+                            ${highlightText(item.title, searchQuery)}
+                        </h3>
+                        <p class="text-xs font-medium text-sky-600 dark:text-sky-400 mb-3">
+                            ${highlightText(item.subtitle, searchQuery)}
+                        </p>
+                        ${item.quote ? `
+                            <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border-l-4 border-sky-500 mb-3 text-xs italic text-slate-700 dark:text-slate-300">
+                                ${highlightText(item.quote, searchQuery)}
+                            </div>
+                        ` : ''}
+                        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-4 whitespace-pre-line">
+                            ${highlightText(item.content, searchQuery)}
+                        </p>
+                    </div>
+
+                    <div>
+                        ${item.action ? `
+                            <div class="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-900 dark:text-amber-200 mb-3">
+                                <strong>💡 實踐指引：</strong> ${highlightText(item.action, searchQuery)}
+                            </div>
+                        ` : ''}
+                        <div class="flex flex-wrap gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-700">
+                            ${item.tags.map(t => `
+                                <span onclick="quickTagSearch('${t}')" class="cursor-pointer text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-sky-600">
+                                    #${t}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function highlightText(text, query) {
+            if (!query) return text;
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<mark class="bg-amber-200 dark:bg-amber-800/80 text-inherit px-0.5 rounded">$1</mark>');
+        }
+
+        function quickTagSearch(tag) {
+            document.getElementById('search-input').value = tag;
+            handleSearch(tag);
+        }
+
+        // ==================== 課堂六步實踐互動模擬 ====================
+        function setStep(idx) {
+            currentStep = idx;
+            for (let i = 0; i < STEPS_DATA.length; i++) {
+                const tab = document.getElementById(`step-tab-${i}`);
+                if (i === idx) {
+                    tab.classList.add('border-sky-500', 'border-2', 'shadow-md');
+                    tab.classList.remove('border-slate-200', 'dark:border-slate-700', 'hover:border-slate-300');
+                } else {
+                    tab.classList.remove('border-sky-500', 'border-2', 'shadow-md');
+                    tab.classList.add('border-slate-200', 'dark:border-slate-700', 'hover:border-slate-300');
+                }
+            }
+
+            const step = STEPS_DATA[idx];
+            const detailContainer = document.getElementById('step-detail-card');
+            detailContainer.innerHTML = `
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-700">
+                    <div>
+                        <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">
+                            課堂步驟 ${step.stepNum} / 06
+                        </span>
+                        <h4 class="text-2xl font-black text-slate-900 dark:text-white mt-2">
+                            ${step.stepNum}. ${step.title} —— ${step.subtitle}
+                        </h4>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="setStep(${Math.max(0, idx - 1)})" ${idx === 0 ? 'disabled class="opacity-40 cursor-not-allowed"' : 'class="hover:bg-slate-100 dark:hover:bg-slate-700"'} class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-medium">上一動</button>
+                        <button onclick="setStep(${Math.min(5, idx + 1)})" ${idx === 5 ? 'disabled class="opacity-40 cursor-not-allowed"' : 'class="bg-sky-600 text-white hover:bg-sky-500"'} class="px-3 py-2 rounded-xl text-xs font-medium">下一動</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div>
+                            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">步驟本質與目標</h5>
+                            <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${step.desc}</p>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
+                            <h5 class="text-xs font-bold text-indigo-700 dark:text-indigo-300 mb-1 flex items-center gap-1.5">
+                                <i data-lucide="user-check" class="w-4 h-4"></i>
+                                <span>學生端具體任務</span>
+                            </h5>
+                            <p class="text-xs text-slate-700 dark:text-slate-300">${step.studentTask}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
+                            <h5 class="text-xs font-bold text-amber-700 dark:text-amber-300 mb-1 flex items-center gap-1.5">
+                                <i data-lucide="megaphone" class="w-4 h-4"></i>
+                                <span>教師關鍵提問句（口訣）</span>
+                            </h5>
+                            <p class="text-sm font-bold text-slate-900 dark:text-white font-serif">${step.teacherPrompt}</p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                    <i data-lucide="terminal" class="w-3.5 h-3.5"></i>
+                                    <span>適用課堂提示詞模組 (Prompt)</span>
+                                </span>
+                                <button onclick="copyToClipboard('${step.promptTemplate.replace(/'/g, "\\'")}')" class="text-xs font-medium text-sky-600 dark:text-sky-400 hover:underline flex items-center gap-1">
+                                    <i data-lucide="copy" class="w-3 h-3"></i>
+                                    <span>複製提示詞</span>
+                                </button>
+                            </div>
+                            <pre class="text-xs bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 overflow-x-auto whitespace-pre-wrap font-mono text-slate-800 dark:text-slate-200">${step.promptTemplate}</pre>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // ==================== 7項檢核工具邏輯 ====================
+        function renderChecklist() {
+            const container = document.getElementById('checklist-items');
+            container.innerHTML = CHECKLIST_DATA.map(item => `
+                <div class="p-4 rounded-2xl border transition-all ${checkedIndicators.has(item.id) ? 'bg-emerald-50/70 border-emerald-300 dark:bg-emerald-950/40 dark:border-emerald-800' : 'bg-slate-50 border-slate-200 dark:bg-slate-700/40 dark:border-slate-700'} flex items-start gap-3">
+                    <input 
+                        type="checkbox" 
+                        id="check-${item.id}" 
+                        ${checkedIndicators.has(item.id) ? 'checked' : ''} 
+                        onchange="toggleChecklist(${item.id})"
+                        class="w-5 h-5 rounded-lg text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-600 mt-0.5 cursor-pointer"
+                    />
+                    <label for="check-${item.id}" class="cursor-pointer flex-1 text-xs sm:text-sm">
+                        <strong class="text-slate-900 dark:text-white mr-2">指標 ${item.id}：${item.name}</strong>
+                        <span class="text-slate-600 dark:text-slate-300">${item.desc}</span>
+                    </label>
+                </div>
+            `).join('');
+            updateProgress();
+        }
+
+        function toggleChecklist(id) {
+            if (checkedIndicators.has(id)) {
+                checkedIndicators.delete(id);
+            } else {
+                checkedIndicators.add(id);
+            }
+            renderChecklist();
+        }
+
+        function updateProgress() {
+            const count = checkedIndicators.size;
+            const progressEl = document.getElementById('checklist-progress');
+            progressEl.innerText = `${count} / 7 項通過`;
+            if (count === 7) {
+                progressEl.className = "px-3 py-1 rounded-full bg-emerald-600 text-white font-bold text-xs";
+            } else {
+                progressEl.className = "px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold text-xs";
+            }
+        }
+
+        function updateReflection() {
+            const r1 = document.getElementById('ref-1').value.trim() || '……';
+            const r2 = document.getElementById('ref-2').value.trim() || '……';
+            const r3 = document.getElementById('ref-3').value.trim() || '……';
+            const r4 = document.getElementById('ref-4').value.trim() || '……';
+            const text = `『我看到學生 ${r1}，這可能支持/阻礙 ${r2}；下一輪可嘗試 ${r3}，再用 ${r4} 證據確認。』`;
+            document.getElementById('reflection-output').innerText = text;
+        }
+
+        function copyReflection() {
+            const text = document.getElementById('reflection-output').innerText;
+            copyToClipboard(text);
+        }
+
+        // ==================== Bloom-AI 金字塔邏輯 ====================
+        function selectBloom(idx) {
+            selectedBloomIndex = idx;
+            for (let i = 0; i < BLOOM_DATA.length; i++) {
+                const btn = document.getElementById(`bloom-btn-${i}`);
+                if (i === idx) {
+                    btn.classList.add('ring-4', 'ring-sky-400', 'scale-[1.04]');
+                } else {
+                    btn.classList.remove('ring-4', 'ring-sky-400', 'scale-[1.04]');
+                }
+            }
+
+            const data = BLOOM_DATA[idx];
+            const card = document.getElementById('bloom-detail-card');
+            card.innerHTML = `
+                <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-600">
+                    <span class="text-xs px-2.5 py-1 rounded-full font-bold ${data.badge}">
+                        認知層級 ${idx + 1} / 6
+                    </span>
+                    <span class="text-xs font-mono text-slate-400">Bloom-AI Framework</span>
+                </div>
+
+                <div>
+                    <h4 class="text-xl font-black text-slate-900 dark:text-white mb-2">
+                        ${data.level}
+                    </h4>
+                    <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                        <strong>學生應具備的核心能力：</strong>${data.ability}
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800">
+                    <h5 class="text-xs font-bold text-rose-700 dark:text-rose-300 mb-1 flex items-center gap-1.5">
+                        <i data-lucide="alert-octagon" class="w-4 h-4"></i>
+                        <span>不能讓 AI 外包的防範準則</span>
+                    </h5>
+                    <p class="text-xs text-rose-900 dark:text-rose-200 leading-relaxed font-medium">
+                        ${data.rule}
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800">
+                    <h5 class="text-xs font-bold text-sky-700 dark:text-sky-300 mb-1 flex items-center gap-1.5">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                        <span>國語文領域對應教學內容實例</span>
+                    </h5>
+                    <p class="text-xs text-slate-800 dark:text-slate-200 leading-relaxed">
+                        ${data.chineseExample}
+                    </p>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        // ==================== 工具函數 ====================
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("已成功複製到剪貼簿！");
+            }).catch(() => {
+                showToast("複製失敗，請手動複製");
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = "fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 animate-bounce";
+            toast.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-emerald-400"></i><span>${msg}</span>`;
+            document.body.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            const icon = document.getElementById('theme-icon');
+            if (isDark) {
+                icon.setAttribute('data-lucide', 'sun');
+            } else {
+                icon.setAttribute('data-lucide', 'moon');
+            }
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
